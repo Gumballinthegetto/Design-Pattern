@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/homeMenu"
+        android:icon="@drawable/home"
+        android:title="@string/home"/>
+    <item android:id="@+id/provincesMenu"
+        android:icon="@drawable/provinces"
+        android:title="@string/provinces"/>
+    <item android:id="@+id/searchMenu"
+        android:icon="@drawable/search_province"
+        android:title="@string/search"/>
+    <item android:id="@+id/profileMenu"
+        android:icon="@drawable/profile"
+        android:title="@string/profile"/>
+    <item android:id="@+id/moreMenu"
+        android:icon="@drawable/more"
+        android:title="@string/more"/>
+</menu>
