@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kh.edu.rupp.ite.visitmekotlin.adapter.RecyclerViewAdapter
-import kh.edu.rupp.ite.visitmekotlin.api.model.ProvincesViewModel
+import kh.edu.rupp.ite.visitmekotlin.api.model.ProvincesModel
 import kh.edu.rupp.ite.visitmekotlin.databinding.FragmentProvincesBinding
 import kh.edu.rupp.ite.visitmekotlin.service.ApiService
 import retrofit2.Call
@@ -43,24 +43,24 @@ class ProvincesFragment : Fragment() {
 
         val apiService = httpClient.create(ApiService::class.java)
 
-        val task: Call<List<ProvincesViewModel>> = apiService.loadProvinceList()
-        task.enqueue(object : Callback<List<ProvincesViewModel>> {
+        val task: Call<List<ProvincesModel>> = apiService.loadProvinceList()
+        task.enqueue(object : Callback<List<ProvincesModel>> {
             override fun onResponse(
-                call: Call<List<ProvincesViewModel>>,
-                response: Response<List<ProvincesViewModel>>
+                call: Call<List<ProvincesModel>>,
+                response: Response<List<ProvincesModel>>
             ) {
                 if (response.isSuccessful) {
                     response.body()?.let { showProvinceList(it) }
                 }
             }
 
-            override fun onFailure(call: Call<List<ProvincesViewModel>>, t: Throwable) {
+            override fun onFailure(call: Call<List<ProvincesModel>>, t: Throwable) {
                 Toast.makeText(context, "Load province list failed!", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    private fun showProvinceList(provinceList: List<ProvincesViewModel>) {
+    private fun showProvinceList(provinceList: List<ProvincesModel>) {
         val layoutManager = LinearLayoutManager(context)
 
         val adapter = RecyclerViewAdapter()

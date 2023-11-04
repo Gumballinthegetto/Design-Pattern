@@ -2,7 +2,7 @@ package kh.edu.rupp.ite.visitmekotlin.api.model
 
 import com.google.gson.annotations.SerializedName
 
-data class ProvincesViewModel(
+data class ProvincesModel(
     @SerializedName("imageUrl")
     private val imageURL: String,
     private val name: String
