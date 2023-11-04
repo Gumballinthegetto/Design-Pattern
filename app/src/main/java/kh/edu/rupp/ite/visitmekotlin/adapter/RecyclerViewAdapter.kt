@@ -1,16 +1,15 @@
 package kh.edu.rupp.ite.visitmekotlin.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import kh.edu.rupp.ite.visitmekotlin.api.model.ProvincesViewModel
+import kh.edu.rupp.ite.visitmekotlin.api.model.Provinces
 import kh.edu.rupp.ite.visitmekotlin.databinding.ViewholderProvinceBinding
 
-class RecyclerViewAdapter: ListAdapter<ProvincesViewModel, RecyclerViewAdapter.ProvinceViewHolder>(ProvinceItemCallBack()) {
+class RecyclerViewAdapter: ListAdapter<Provinces, RecyclerViewAdapter.ProvinceViewHolder>(ProvinceItemCallBack()) {
 
     private lateinit var binding: ViewholderProvinceBinding
 
@@ -24,30 +23,30 @@ class RecyclerViewAdapter: ListAdapter<ProvincesViewModel, RecyclerViewAdapter.P
     }
 
     override fun onBindViewHolder(holder: ProvinceViewHolder, position: Int) {
-        val provinceItem: ProvincesViewModel = getItem(position)
+        val provinceItem: Provinces = getItem(position)
         holder.bind(provinceItem)
     }
 
-    class ProvinceItemCallBack: DiffUtil.ItemCallback<ProvincesViewModel>() {
+    class ProvinceItemCallBack: DiffUtil.ItemCallback<Provinces>() {
         override fun areItemsTheSame(
-            oldItem: ProvincesViewModel,
-            newItem: ProvincesViewModel
+            oldItem: Provinces,
+            newItem: Provinces
         ): Boolean {
             return oldItem.toString() == newItem.toString()
         }
 
         override fun areContentsTheSame(
-            oldItem: ProvincesViewModel,
-            newItem: ProvincesViewModel
+            oldItem: Provinces,
+            newItem: Provinces
         ): Boolean {
             return oldItem == newItem
         }
 
     }
 
-    class ProvinceViewHolder(private var itemBinding: ViewholderProvinceBinding): RecyclerView.ViewHolder(itemBinding.root)  {
+    class ProvinceViewHolder(private var itemBinding: ViewholderProvinceBinding): RecyclerView.ViewHolder(itemBinding.root) {
 
-        fun bind(provinceItem: ProvincesViewModel) {
+        fun bind(provinceItem: Provinces) {
             Picasso.get().load(provinceItem.getImageUrl()).into(itemBinding.provinceImage)
             itemBinding.provinceName.text = provinceItem.getName()
         }
