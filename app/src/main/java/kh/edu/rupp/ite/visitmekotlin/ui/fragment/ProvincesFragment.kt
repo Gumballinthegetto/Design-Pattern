@@ -9,8 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kh.edu.rupp.ite.visitmekotlin.adapter.RecyclerViewAdapter
 import kh.edu.rupp.ite.visitmekotlin.api.model.Provinces
+import kh.edu.rupp.ite.visitmekotlin.api.model.Status
 import kh.edu.rupp.ite.visitmekotlin.databinding.FragmentProvincesBinding
 import kh.edu.rupp.ite.visitmekotlin.service.ApiService
+import kh.edu.rupp.ite.visitmekotlin.ui.viewmodel.ProvincesViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,6 +22,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 class ProvincesFragment : Fragment() {
 
     private lateinit var binding: FragmentProvincesBinding
+    private val viewModel = ProvincesViewModel()
+    private lateinit var adapter: RecyclerViewAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,41 +36,22 @@ class ProvincesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loadProvinceList()
-    }
 
-    private fun loadProvinceList() {
-        val httpClient = Retrofit.Builder()
-            .baseUrl("https://tests3bk.s3.ap-southeast-1.amazonaws.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        adapter = RecyclerViewAdapter()
 
-        val apiService = httpClient.create(ApiService::class.java)
-
-        val task: Call<List<Provinces>> = apiService.loadProvinceList()
-        task.enqueue(object : Callback<List<Provinces>> {
-            override fun onResponse(
-                call: Call<List<Provinces>>,
-                response: Response<List<Provinces>>
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.let { showProvinceList(it) }
-                }
-            }
-
-            override fun onFailure(call: Call<List<Provinces>>, t: Throwable) {
-                Toast.makeText(context, "Load province list failed!", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun showProvinceList(provinceList: List<Provinces>) {
         val layoutManager = LinearLayoutManager(context)
-
-        val adapter = RecyclerViewAdapter()
-        adapter.submitList(provinceList)
 
         binding.provincesRecyclerView.layoutManager = layoutManager
         binding.provincesRecyclerView.adapter = adapter
+
+        viewModel.loadProvinceList()
+
+        viewModel.provincesData.observe(viewLifecycleOwner) {
+            when (it.status) {
+                Status.PROCESSING -> Toast.makeText(context, "Loading", Toast.LENGTH_SHORT).show()
+                Status.SUCCESS -> adapter.submitList(it.data)
+                Status.ERROR -> Toast.makeText(context, "Error while loading data from server", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }
