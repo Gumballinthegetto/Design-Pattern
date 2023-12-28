@@ -1,17 +1,26 @@
 package kh.edu.rupp.ite.visitmekotlin.ui.viewmodel
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kh.edu.rupp.ite.visitmekotlin.api.model.ApiData
 import kh.edu.rupp.ite.visitmekotlin.api.model.Provinces
 import kh.edu.rupp.ite.visitmekotlin.api.model.Status
+import kh.edu.rupp.ite.visitmekotlin.client.ApiClient
 import kh.edu.rupp.ite.visitmekotlin.service.ApiService
+import kh.edu.rupp.ite.visitmekotlin.utility.AppPreference
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.lang.Exception
 
 class ProvincesViewModel: ViewModel() {
 
@@ -21,34 +30,32 @@ class ProvincesViewModel: ViewModel() {
 
     fun loadProvinceList() {
 
-        val apiData = ApiData<List<Provinces>>(Status.PROCESSING, null)
+        var apiData = ApiData<List<Provinces>>(Status.PROCESSING, null)
         _provincesData.postValue(apiData)
 
-        val httpClient = Retrofit.Builder()
-            .baseUrl("https://tests3bk.s3.ap-southeast-1.amazonaws.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val apiService = httpClient.create(ApiService::class.java)
-        val task: Call<List<Provinces>> = apiService.loadProvinceList()
-        task.enqueue(object : Callback<List<Provinces>> {
-            override fun onResponse(
-                call: Call<List<Provinces>>,
-                response: Response<List<Provinces>>
-            ) {
-                if (response.isSuccessful) {
-                    val apiData = ApiData(Status.SUCCESS, response.body())
-                    _provincesData.postValue(apiData)
-                } else {
-                    val apiData = ApiData<List<Provinces>>(Status.ERROR, null)
-                    _provincesData.postValue(apiData)
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            apiData = try {
+                val response = ApiClient.get().apiService.loadProvinceList()
+                ApiData(Status.SUCCESS, response)
+            } catch (ex: Exception) {
+                Log.e("ited", "Load province error: ${ex.message}")
+                ApiData(Status.ERROR, null)
             }
 
-            override fun onFailure(call: Call<List<Provinces>>, t: Throwable) {
-                val apiData = ApiData<List<Provinces>>(Status.ERROR, null)
+            withContext(Dispatchers.Main.immediate) {
                 _provincesData.postValue(apiData)
             }
-        })
+        }
+    }
+
+    fun login(context: Context, username: String, password: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = ApiClient.get().apiService.login()
+                AppPreference.get(context).storeApiToken(response)
+            } catch (ex: Exception) {
+                Log.e("ited", "Load provinces error: ${ex.message}")
+            }
+        }
     }
 }
